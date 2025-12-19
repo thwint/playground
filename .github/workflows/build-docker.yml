@@ -1,0 +1,32 @@
+---
+name: Build docker image
+on:
+  workflow_call:
+
+jobs:
+  docker_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.8e8c483db84b4bee98b60c0593521ed34d9990e8
+
+      - uses: actions/download-artifact@v5
+        with:
+          name: build-artifacts
+          path: your/destination/dir
+
+      - name: Display structure of downloaded files
+        run: ls -R your/destination/dir
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          push: false
+          context: .
+          tags: thwint/playground:latest

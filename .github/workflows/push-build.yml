@@ -1,0 +1,34 @@
+---
+name: Build on push
+on: push
+
+jobs:
+  maven_build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.8e8c483db84b4bee98b60c0593521ed34d9990e8
+
+      - name: Setup Java
+        uses: actions/setup-java@f2beeb24e141e01a676f977032f5a29d81c9e27e # v5.1.0
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Set up Maven
+        uses: stCarolas/setup-maven@v5
+        with:
+          maven-version: 3.8.2
+
+      - name: Build
+        run: mvn clean install --no-transfer-progress
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: build-artifacts
+          path: 'target/*.jar'
+
+  docker_build:
+    needs: maven_build
+    uses: ./.github/workflows/build-docker.yml
